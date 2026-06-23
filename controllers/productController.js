@@ -84,3 +84,27 @@ exports.deleteProduct = async (req, res) => {
         return res.status(500).json({ message: 'Server error deleting product.', error: error.message });
     }
 };
+
+const db = require('../models');
+
+// GET /api/products/:id
+exports.getProductById = async (req, res) => {
+    try {
+        const product = await db.Product.findByPk(req.params.id, {
+            include: [
+                { model: db.Category },
+                { model: db.ProductImage },
+                { model: db.Variant }
+            ]
+        });
+
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found.' });
+        }
+
+        res.json(product);
+    } catch (error) {
+        console.error('Error fetching product details:', error);
+        res.status(500).json({ message: 'Internal server error during relationship evaluation.' });
+    }
+};

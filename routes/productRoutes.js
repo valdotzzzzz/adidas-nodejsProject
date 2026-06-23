@@ -5,6 +5,7 @@ const { protect, authorize } = require('../middlewares/authMiddleware');
 
 // Public catalog routes
 router.get('/', productController.getAllProducts);
+router.get('/:id', productController.getProductById);
 
 // Admin/Staff Protected CRUD endpoints (Fulfills Quiz 6)
 router.post('/', protect, authorize('admin', 'staff'), productController.createProduct);

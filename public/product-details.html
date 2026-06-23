@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adidas | Product Details</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="js/layout.js"></script>
+</head>
+<body>
+
+    <section class="products-section" style="background-color: #000000; min-height: 80vh; padding-top: 40px;">
+        <div class="adidas-hero" style="background-color: transparent; min-height: auto; grid-template-columns: 1.2fr 0.8fr; gap: 5%;">
+            
+            <div class="adidas-hero__image" style="background-color: #111111; min-height: 600px; border: 1px solid #1a1a1a;">
+                <img id="detail-image" src="" alt="Product Image" style="object-fit: contain; padding: 40px;">
+            </div>
+
+            <div class="adidas-hero__content" style="padding: 0; display: flex; flex-direction: column; justify-content: flex-start;">
+                <div class="adidas-hero__eyebrow" id="detail-category">Adidas Performance</div>
+                <h1 class="adidas-hero__headline" id="detail-name" style="font-size: 40px; margin-bottom: 12px;">Loading...</h1>
+                
+                <div class="product-card__price" id="detail-price" style="font-size: 24px; font-weight: 700; margin-bottom: 24px;">₱0.00</div>
+                
+                <p class="adidas-hero__sub" id="detail-desc" style="margin-bottom: 32px; max-width: 100%;"></p>
+                
+                <div class="form-group" style="margin-bottom: 32px;">
+                    <label style="margin-bottom: 12px;">Available Options / Style Code: <span id="detail-style-code" style="color:#fff;"></span></label>
+                    <div id="variant-container" style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px;">
+                        </div>
+                    <div class="field-error" id="variant-error" style="margin-top: 12px;">Please select an option before proceeding.</div>
+                </div>
+
+                <div class="adidas-hero__actions" style="margin-top: 16px;">
+                    <button id="addToCartBtn" class="btn btn-primary" style="width: 100%; height: 55px; letter-spacing: 2px;">Add to Bag</button>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <script src="js/product-details.js"></script>
+</body>
+</html>
