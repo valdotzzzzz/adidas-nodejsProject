@@ -1,26 +1,35 @@
 const express = require('express');
-const sequelize = require('./config/database');
+const db = require('./models'); // Loads all models and associations simultaneously
 require('dotenv').config();
+
+const authRoutes = require('./routes/authRoutes'); 
+const adminRoutes = require('./routes/adminRoutes');
+const productRoutes = require('./routes/productRoutes');
 
 const app = express();
 app.use(express.json());
+app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 
-/*app.get('/', (req, res) => {
+// Routing Middleware
+app.use('/api/auth', authRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/products', productRoutes);
+
+app.get('/', (req, res) => {
     res.send('<h1>Adidas E-Commerce API Backend is running!</h1>');
 });
-*/
 
 const PORT = process.env.PORT || 3000;
 
-// Sync Database models with MySQL server
-sequelize.sync({ force: false }) // Use force: true only if you want to drop tables on reset
+// Sync database schema using the centralized model definitions
+db.sequelize.sync({ force: false }) 
     .then(() => {
-        console.log('Database connected and synced successfully.');
+        console.log('Database connected and relational models synced successfully.');
         app.listen(PORT, () => {
-            console.log(`Server running smoothly on port ${PORT}`);
+            console.log(`Server running on port ${PORT}`);
         });
     })
     .catch(err => {
-        console.error('Unable to connect to the database:', err);
+        console.error('Database connection synchronization failure:', err);
     });
