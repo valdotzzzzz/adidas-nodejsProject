@@ -1,16 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Adidas Login</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adidas | Home</title>
+    <link rel="stylesheet" href="css/style.css">
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="js/layout.js"></script>
 </head>
 <body>
-    <h2>Login</h2>
-    <form id="loginForm">
-        <input type="email" id="email" placeholder="Email" required><br>
-        <input type="password" id="password" placeholder="Password" required><br>
-        <button type="submit">Login</button>
-    </form>
-    <script src="js/auth.js"></script>
+
+    <section class="adidas-hero">
+        <div class="adidas-hero__content">
+            <div class="adidas-hero__eyebrow">New Collection 2026</div>
+            <h1 class="adidas-hero__headline">
+                Built To<br><em>Move</em><br>You
+            </h1>
+            <p class="adidas-hero__sub">
+                Performance footwear engineered for athletes. Every step, every sport, every street.
+            </p>
+            <div class="adidas-hero__actions">
+                <a href="shop.html" class="btn btn-primary">Shop Now</a>
+                <a href="shop.html?category=running" class="btn btn-outline">Explore Running</a>            
+            </div>
+        </div>
+
+        <div class="adidas-hero__image">
+            <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=1200&q=80" alt="Adidas running shoe hero">
+            <div class="adidas-hero__image-overlay"></div>
+        </div>
+    </section>
+
+    <section class="categories-section">
+        <div class="section-header" style="border-bottom-color: #333; margin-bottom: 32px;">
+            <div>
+                <div class="section-label" style="color: #666;">Browse By Sport</div>
+                <h2 class="section-title" style="color: #fff;">Find Your Game</h2>
+            </div>
+            <a href="shop.html" class="btn btn-outline" style="font-size:12px;">View All</a>
+        </div>
+
+        <div class="categories-grid">
+            <a href="shop.html?category=running" class="category-card">
+                <img src="https://images.unsplash.com/photo-1571008887538-b36bb32f4571?w=800&q=80" alt="Running">
+                <div class="category-card__overlay">
+                    <div class="category-card__title">Running</div>
+                    <span class="btn btn-primary" style="font-size:11px; padding: 10px 20px;">Shop Now</span>
+                </div>
+            </a>
+
+            <a href="shop.html?category=lifestyle" class="category-card">
+                <img src="https://images.unsplash.com/photo-1603808033192-082d6919d3e1?w=800&q=80" alt="Lifestyle">
+                <div class="category-card__overlay">
+                    <div class="category-card__title">Lifestyle</div>
+                    <span class="btn btn-primary" style="font-size:11px; padding: 10px 20px;">Shop Now</span>
+                </div>
+            </a>
+
+            <a href="shop.html?category=basketball" class="category-card">
+                <img src="https://images.unsplash.com/photo-1515339760107-1952b7a08454?w=800&q=80" alt="Basketball">
+                <div class="category-card__overlay">
+                    <div class="category-card__title">Basketball</div>
+                    <span class="btn btn-primary" style="font-size:11px; padding: 10px 20px;">Shop Now</span>
+                </div>
+            </a>
+        </div>
+    </section>
+
+    <section class="products-section">
+        <div class="section-header">
+            <div>
+                <div class="section-label">Hand Picked</div>
+                <h2 class="section-title">Featured Drops</h2>
+            </div>
+            <a href="shop.html" class="btn btn-dark" style="font-size:12px;">See All</a>
+        </div>
+
+        <div class="products-grid" id="featured-products">
+            </div>
+    </section>
+
+    <section class="adidas-banner">
+        <div class="adidas-banner__text">
+            Impossible<br>Is <em>Nothing</em>
+        </div>
+        <div>
+            <p style="font-size:16px; font-weight:600; color:#333; margin-bottom:20px; max-width:320px;">
+                Free shipping on orders over ₱3,000. Premium performance. No compromises.
+            </p>
+            <a href="shop.html" class="btn btn-dark">Shop the Collection</a>
+        </div>
+    </section>
+
+    <script src="js/home.js"></script>
 </body>
 </html>

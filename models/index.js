@@ -16,6 +16,8 @@ const db = {
     Product,
     ProductImage,
     Variant,
+    Order,       
+    OrderItem,   
     sequelize,
     Sequelize
 };
@@ -41,9 +43,5 @@ db.OrderItem.belongsTo(db.Order, { foreignKey: 'order_id' });
 // Product <-> OrderItem (One-to-Many)
 db.Product.hasMany(db.OrderItem, { foreignKey: 'product_id' });
 db.OrderItem.belongsTo(db.Product, { foreignKey: 'product_id' });
-
-// Add new models to the db object export
-db.Order = Order;
-db.OrderItem = OrderItem;
 
 module.exports = db;

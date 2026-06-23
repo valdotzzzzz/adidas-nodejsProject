@@ -1,0 +1,486 @@
+/* ==========================================================================
+   RESET & FOUNDATIONS
+   ========================================================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'AdihausDIN', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+/* ==========================================================================
+   GLOBAL SITEWIDE HEADER
+   ========================================================================== */
+.adidas-header {
+    background-color: #000000;
+    border-bottom: 1px solid #1a1a1a;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    height: 80px;
+}
+
+.header-container {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 5%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo {
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+}
+
+.main-nav {
+    display: flex;
+    gap: 32px;
+}
+
+.nav-link {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #ffffff;
+    padding: 8px 0;
+    border-bottom: 2px solid transparent;
+    transition: border-color 0.2s ease;
+}
+
+.nav-link:hover {
+    border-color: #ffffff;
+}
+
+.user-actions {
+    display: flex;
+    align-items: center;
+}
+
+.btn-link, .logout-link {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #ffffff;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.logout-link {
+    color: #ff4444;
+    margin-left: 20px;
+}
+
+/* ==========================================================================
+   GLOBAL SITEWIDE FOOTER
+   ========================================================================== */
+.adidas-footer {
+    background-color: #000000;
+    border-top: 1px solid #1a1a1a;
+    padding: 80px 5% 40px 5%;
+    margin-top: 0;
+}
+
+.footer-container {
+    max-width: 1440px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    gap: 80px;
+    margin-bottom: 60px;
+}
+
+.footer-brand {
+    color: #ffffff;
+}
+
+.footer-links {
+    display: flex;
+    gap: 100px;
+}
+
+.footer-col {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.footer-col h4 {
+    font-size: 14px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+    color: #ffffff;
+}
+
+.footer-col a {
+    font-size: 13px;
+    color: #888888;
+    transition: color 0.2s ease;
+}
+
+.footer-col a:hover {
+    color: #ffffff;
+}
+
+.footer-bottom {
+    max-width: 1440px;
+    margin: 0 auto;
+    border-top: 1px solid #1a1a1a;
+    padding-top: 40px;
+    text-align: center;
+}
+
+.footer-bottom p {
+    font-size: 12px;
+    color: #555555;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+@media (max-width: 768px) {
+    .footer-container { flex-direction: column; gap: 40px; }
+    .footer-links { flex-direction: column; gap: 40px; }
+    .main-nav { display: none; }
+}
+
+body {
+    background-color: #000000;
+    color: #ffffff;
+    overflow-x: hidden;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* ==========================================================================
+   BUTTONS (COMPONENTS)
+   ========================================================================== */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 24px;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+    border: 1px solid transparent;
+}
+
+.btn-primary {
+    background-color: #ffffff;
+    color: #000000;
+}
+
+.btn-primary:hover {
+    color: #ffffff;
+    background-color: #333333;
+}
+
+.btn-outline {
+    background-color: transparent;
+    color: #ffffff;
+    border-color: #ffffff;
+}
+
+.btn-outline:hover {
+    background-color: #ffffff;
+    color: #000000;
+}
+
+.btn-dark {
+    background-color: #000000;
+    color: #ffffff;
+    border-color: #ffffff;
+}
+
+.btn-dark:hover {
+    background-color: #ffffff;
+    color: #000000;
+}
+
+/* ==========================================================================
+   HERO SECTION
+   ========================================================================== */
+.adidas-hero {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 80vh;
+    background-color: #111111;
+    align-items: center;
+}
+
+.adidas-hero__content {
+    padding: 10%;
+}
+
+.adidas-hero__eyebrow {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: #aaaaaa;
+    margin-bottom: 16px;
+}
+
+.adidas-hero__headline {
+    font-size: 64px;
+    font-weight: 900;
+    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: -1px;
+    margin-bottom: 24px;
+}
+
+.adidas-hero__headline em {
+    font-style: italic;
+    font-weight: 400;
+}
+
+.adidas-hero__sub {
+    font-size: 16px;
+    color: #cccccc;
+    line-height: 1.6;
+    margin-bottom: 40px;
+    max-width: 450px;
+}
+
+.adidas-hero__actions {
+    display: flex;
+    gap: 16px;
+}
+
+.adidas-hero__image {
+    position: relative;
+    height: 100%;
+    min-height: 500px;
+}
+
+.adidas-hero__image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, #111111 0%, transparent 30%);
+}
+
+/* ==========================================================================
+   COMMON LAYOUT HEADERS
+   ========================================================================== */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 40px;
+    border-bottom: 1px solid #222222;
+    padding-bottom: 20px;
+}
+
+.section-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #888888;
+    margin-bottom: 8px;
+}
+
+.section-title {
+    font-size: 32px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* ==========================================================================
+   CATEGORIES GRID
+   ========================================================================== */
+.categories-section {
+    padding: 80px 5%;
+}
+
+.categories-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+
+.category-card {
+    position: relative;
+    height: 500px;
+    overflow: hidden;
+}
+
+.category-card img {
+    transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.category-card:hover img {
+    transform: scale(1.05);
+}
+
+.category-card__overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 40px;
+    background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.category-card__title {
+    font-size: 24px;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    letter-spacing: 1px;
+}
+
+/* ==========================================================================
+   PRODUCT GRID & CARDS
+   ========================================================================== */
+.products-section {
+    padding: 80px 5%;
+    background-color: #050505;
+}
+
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+}
+
+.product-card {
+    background-color: #111111;
+    border: 1px solid #1a1a1a;
+    transition: border-color 0.2s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.product-card:hover {
+    border-color: #333333;
+}
+
+.product-card__image {
+    position: relative;
+    height: 320px;
+    background-color: #1a1a1a;
+}
+
+.product-card__badge {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    background-color: #ffffff;
+    color: #000000;
+    padding: 4px 12px;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.product-card__info {
+    padding: 20px;
+    flex-grow: 1;
+}
+
+.product-card__category {
+    font-size: 12px;
+    text-transform: uppercase;
+    color: #777777;
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+}
+
+.product-card__name {
+    font-size: 16px;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.product-card__price {
+    font-size: 15px;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.product-card__quick-add {
+    border-top: 1px solid #1a1a1a;
+    padding: 16px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    background-color: #111111;
+    color: #ffffff;
+    transition: background-color 0.2s ease;
+}
+
+.product-card__quick-add:hover {
+    background-color: #ffffff;
+    color: #000000;
+}
+
+/* ==========================================================================
+   PROMO BANNER
+   ========================================================================== */
+.adidas-banner {
+    background-color: #f5f5f5;
+    color: #000000;
+    padding: 100px 10%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.adidas-banner__text {
+    font-size: 56px;
+    font-weight: 900;
+    text-transform: uppercase;
+    line-height: 0.95;
+    letter-spacing: -2px;
+}
+
+.adidas-banner__text em {
+    font-style: italic;
+    font-weight: 400;
+}
+
+/* ==========================================================================
+   RESPONSIVE SCALING
+   ========================================================================== */
+@media (max-width: 1024px) {
+    .products-grid { grid-template-columns: repeat(2, 1fr); }
+    .categories-grid { grid-template-columns: 1fr; }
+    .adidas-hero { grid-template-columns: 1fr; }
+    .adidas-banner { flex-direction: column; align-items: flex-start; gap: 40px; }
+}
