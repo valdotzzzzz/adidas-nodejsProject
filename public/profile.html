@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adidas | My Profile</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="js/layout.js"></script>
+</head>
+<body>
+
+    <section class="products-section">
+        <div class="section-header">
+            <div>
+                <div class="section-label">Account</div>
+                <h2 class="section-title" style="font-size: 36px;">My Profile</h2>
+            </div>
+        </div>
+
+        <div class="profile-layout">
+
+            <div class="profile-nav">
+                <a href="profile.html" class="active">Profile</a>
+                <a href="#" class="disabled" title="Coming soon">My Orders</a>
+                <a href="#" class="disabled" title="Coming soon">My Cart</a>
+            </div>
+
+            <!-- ===================== PROFILE INFO ===================== -->
+            <div class="profile-section">
+                <div class="profile-section__title">Profile Information</div>
+                <p class="profile-section__sub">Update your account's name and email address.</p>
+
+                <form id="profileInfoForm">
+                    <div class="form-group">
+                        <label class="form-label">Name</label>
+                        <input type="text" name="name" id="profile_name" class="form-control" required autofocus>
+                        <div class="form-error" id="profile_name_error"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" name="email" id="profile_email" class="form-control" required>
+                        <div class="form-error" id="profile_email_error"></div>
+                    </div>
+
+                    <div style="display:flex; align-items:center; gap:16px;">
+                        <button type="submit" class="btn btn-dark">Save</button>
+                        <span class="profile-saved-msg" id="profileInfoSavedMsg" style="display:none;">Saved.</span>
+                    </div>
+                </form>
+            </div>
+
+            <!-- ===================== UPDATE PASSWORD ===================== -->
+            <div class="profile-section">
+                <div class="profile-section__title">Update Password</div>
+                <p class="profile-section__sub">Ensure your account is using a long, random password to stay secure.</p>
+
+                <form id="updatePasswordForm">
+                    <div class="form-group">
+                        <label class="form-label">Current Password</label>
+                        <input type="password" name="current_password" id="current_password" class="form-control" autocomplete="current-password">
+                        <div class="form-error" id="current_password_error"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">New Password</label>
+                        <input type="password" name="password" id="new_password" class="form-control" autocomplete="new-password">
+                        <div class="form-error" id="new_password_error"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Confirm Password</label>
+                        <input type="password" name="password_confirmation" id="password_confirmation" class="form-control" autocomplete="new-password">
+                        <div class="form-error" id="password_confirmation_error"></div>
+                    </div>
+
+                    <div style="display:flex; align-items:center; gap:16px;">
+                        <button type="submit" class="btn btn-dark">Save</button>
+                        <span class="profile-saved-msg" id="passwordSavedMsg" style="display:none;">Saved.</span>
+                    </div>
+                </form>
+            </div>
+
+            <!-- ===================== ADDRESS BOOK ===================== -->
+            <div class="profile-section">
+                <div class="profile-section__title">Address Book</div>
+                <p class="profile-section__sub">Manage your saved shipping addresses.</p>
+
+                <div class="address-grid" id="addressGrid">
+                    <div class="address-empty">Loading your addresses…</div>
+                </div>
+
+                <button type="button" class="btn btn-outline" id="openAddAddressBtn" style="margin-top: 16px;">
+                    + Add New Address
+                </button>
+            </div>
+
+            <!-- ===================== DELETE ACCOUNT ===================== -->
+            <div class="profile-section profile-section--danger">
+                <div class="profile-section__title">Delete Account</div>
+                <p class="profile-section__sub">
+                    Once your account is deleted, all of its data will be permanently removed.
+                    Please download any data you wish to keep before proceeding.
+                </p>
+
+                <form id="deleteAccountForm">
+                    <div class="form-group" style="max-width:300px;">
+                        <label class="form-label">Confirm Password</label>
+                        <input type="password" name="password" id="delete_password" class="form-control" placeholder="Enter your password">
+                        <div class="form-error" id="delete_password_error"></div>
+                    </div>
+
+                    <button type="submit" class="btn" style="background:#E53E3E; color:#fff;">Delete Account</button>
+                </form>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ===================== ADDRESS MODAL (shared by Add + Edit) ===================== -->
+    <div class="admin-modal-overlay" id="addressModal">
+        <div class="admin-modal-window">
+            <div class="admin-modal-header">
+                <h3 id="addressModalTitle">New Address</h3>
+                <button class="admin-modal-close" id="closeAddressModalBtn">✕</button>
+            </div>
+
+            <form id="addressForm" class="modal-form-wrapper" style="display:block;">
+                <input type="hidden" id="address_id_field">
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Label</label>
+                        <select id="addr_label" class="form-control">
+                            <option value="Home">Home</option>
+                            <option value="Office">Office</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Recipient Name</label>
+                        <input type="text" id="addr_full_name" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Phone</label>
+                    <input type="text" id="addr_phone" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Street Address</label>
+                    <input type="text" id="addr_address_line" class="form-control" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">City</label>
+                        <input type="text" id="addr_city" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Province</label>
+                        <input type="text" id="addr_province" class="form-control">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Postal Code</label>
+                    <input type="text" id="addr_postal_code" class="form-control">
+                </div>
+
+                <button type="submit" class="btn btn-dark" style="width:100%;">Save Address</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/profile.js"></script>
+</body>
+</html>

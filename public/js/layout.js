@@ -24,7 +24,7 @@ function renderHeader() {
                         <a href="login.html" class="btn-link">Sign In</a>
                     </div>
                     <div id="user-menu" class="auth-group" style="display: none;">
-                        <a href="dashboard.html" class="btn-link">Dashboard</a>
+                        <a href="profile.html" class="btn-link">My Profile</a>
                         <button id="logoutBtn" class="logout-link">Sign Out</button>
                     </div>
                 </div>

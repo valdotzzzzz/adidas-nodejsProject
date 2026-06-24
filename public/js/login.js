@@ -48,7 +48,21 @@ $(document).ready(function() {
             data: JSON.stringify({ email, password }),
             success: function(response) {
                 if (response.token) {
+                    // 1. Clear out any old session info first
+                    localStorage.clear();
+
+                    // 2. Save the fresh authentication token
                     localStorage.setItem('token', response.token);
+                    
+                    // 3. Extract and save the role from inside the user object
+                    if (response.user && response.user.role) {
+                        localStorage.setItem('role', response.user.role);
+                    } else {
+                        // Safe fallback check just in case it ever changes
+                        localStorage.setItem('role', response.role || 'customer');
+                    }
+
+                    // 4. Redirect to the main site index
                     window.location.href = 'index.html';
                 } else {
                     $('#global-error').text('Invalid server response signature structural payload.').show();

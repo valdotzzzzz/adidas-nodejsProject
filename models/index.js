@@ -9,6 +9,7 @@ const ProductImage = require('./ProductImage');
 const Variant = require('./Variant');
 const Order = require('./Order');
 const OrderItem = require('./OrderItem');
+const Address = require('./Address');
 
 const db = {
     User,
@@ -18,6 +19,7 @@ const db = {
     Variant,
     Order,       
     OrderItem,   
+    Address,
     sequelize,
     Sequelize
 };
@@ -47,5 +49,9 @@ db.OrderItem.belongsTo(db.Product, { foreignKey: 'product_id' });
 //Product <-> category
 db.Category.hasMany(db.Product, { foreignKey: 'category_id' });
 db.Product.belongsTo(db.Category, { foreignKey: 'category_id' });
+
+// User <-> Address (One-to-Many)
+db.User.hasMany(db.Address, { foreignKey: 'user_id', onDelete: 'CASCADE' });
+db.Address.belongsTo(db.User, { foreignKey: 'user_id' });
 
 module.exports = db;
