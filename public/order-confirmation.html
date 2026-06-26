@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adidas | Order Confirmed</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="js/layout.js"></script>
+</head>
+<body>
+
+    <section class="products-section" style="min-height: 70vh;">
+        <div style="max-width: 700px; margin: 0 auto; padding: 60px 0; text-align: center;">
+
+            <div style="width:64px; height:64px; background:#000; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 24px; color:#fff; font-size:32px;">
+                ✓
+            </div>
+
+            <h2 class="section-title" style="margin-bottom: 12px;">Order Confirmed!</h2>
+            <p style="color:#888; margin-bottom: 32px;">Thank you for your purchase. We'll send updates to your account.</p>
+
+            <div id="order-loading" style="color:#888;">Loading order details...</div>
+
+            <div id="order-details" style="display:none; background:#f5f5f5; padding:24px; text-align:left; margin-bottom:32px;">
+                <div style="display:flex; justify-content:space-between; padding:8px 0; font-size:14px;">
+                    <span>Order Number</span>
+                    <strong id="order-number"></strong>
+                </div>
+                <div style="display:flex; justify-content:space-between; padding:8px 0; font-size:14px;">
+                    <span>Payment Method</span>
+                    <strong id="order-payment"></strong>
+                </div>
+                <div style="display:flex; justify-content:space-between; padding:8px 0; font-size:14px;">
+                    <span>Total</span>
+                    <strong id="order-total"></strong>
+                </div>
+                <div style="display:flex; justify-content:space-between; padding:8px 0; font-size:14px;">
+                    <span>Shipping To</span>
+                    <strong id="order-address"></strong>
+                </div>
+            </div>
+
+            <div style="display:flex; gap:12px; justify-content:center;">
+                <a href="shop.html" class="btn btn-dark" style="padding:14px 28px;">Continue Shopping</a>
+            </div>
+
+        </div>
+    </section>
+
+    <script src="js/order-confirmation.js"></script>
+</body>
+</html>

@@ -25,21 +25,67 @@
                 
                 <p class="adidas-hero__sub" id="detail-desc" style="margin-bottom: 32px; max-width: 100%;"></p>
                 
-                <div class="form-group" style="margin-bottom: 32px;">
+               <div class="form-group" style="margin-bottom: 32px;">
                     <label style="margin-bottom: 12px;">Available Options / Style Code: <span id="detail-style-code" style="color:#fff;"></span></label>
                     <div id="variant-container" style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px;">
                         </div>
                     <div class="field-error" id="variant-error" style="margin-top: 12px;">Please select an option before proceeding.</div>
                 </div>
 
+                <div class="form-group" style="margin-bottom: 32px;">
+                    <label style="margin-bottom: 12px;">Quantity</label>
+                    <div style="display:flex; align-items:center; width:fit-content; border:1.5px solid #444;">
+                        <button type="button" id="qtyMinusBtn" class="btn btn-dark" style="padding:10px 16px; font-size:16px;">−</button>
+                        <input type="number" id="qtyInput" value="1" min="1" readonly style="width:50px; text-align:center; border:none; background:#000; color:#fff; font-size:14px; font-weight:700;">
+                        <button type="button" id="qtyPlusBtn" class="btn btn-dark" style="padding:10px 16px; font-size:16px;">+</button>
+                    </div>
+                </div>
+
                 <div class="adidas-hero__actions" style="margin-top: 16px;">
                     <button id="addToCartBtn" class="btn btn-primary" style="width: 100%; height: 55px; letter-spacing: 2px;">Add to Cart</button>
+                </div>
+                <div id="cart-feedback" style="margin-top: 12px; font-size: 13px; display:none;">
+
                 </div>
             </div>
 
         </div>
     </section>
+<section class="products-section" style="max-width: 900px; margin: 0 auto;">
+        <div class="section-header">
+            <div>
+                <div class="section-label">Customer Feedback</div>
+                <h2 class="section-title" style="font-size: 28px;">Reviews</h2>
+            </div>
+        </div>
 
+        <div id="review-form-container" style="display:none; background:#f5f5f5; padding:24px; margin-bottom:32px;">
+            <form id="reviewForm">
+                <div class="form-group">
+                    <label class="form-label">Your Rating</label>
+                    <select id="review-rating" class="form-control" required style="max-width:200px;">
+                        <option value="">Select</option>
+                        <option value="5">★★★★★ Excellent</option>
+                        <option value="4">★★★★☆ Good</option>
+                        <option value="3">★★★☆☆ Average</option>
+                        <option value="2">★★☆☆☆ Poor</option>
+                        <option value="1">★☆☆☆☆ Terrible</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Your Review</label>
+                    <textarea id="review-comment" class="form-control" rows="3" placeholder="Tell us what you think about this shoe..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-dark">Submit Review</button>
+            </form>
+        </div>
+
+        <div id="review-locked-message" style="display:none; background:#f5f5f5; padding:20px; margin-bottom:32px; font-size:13px; color:#888;">
+            You can only review this product after purchasing it.
+        </div>
+
+        <div id="reviews-list"></div>
+    </section>
     <script src="js/product-details.js"></script>
 </body>
 </html>

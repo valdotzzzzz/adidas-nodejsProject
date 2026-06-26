@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adidas | Checkout</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="js/layout.js"></script>
+</head>
+<body>
+
+    <section class="products-section">
+        <div class="section-header">
+            <div>
+                <div class="section-label">Checkout</div>
+                <h2 class="section-title">Complete Your Order</h2>
+            </div>
+        </div>
+
+        <div id="checkout-loading" style="padding: 60px 0; text-align: center; color: #888;">
+            Loading checkout...
+        </div>
+
+        <div id="checkout-layout" style="display:none; grid-template-columns: 1fr 380px; gap: 40px;">
+
+            <form id="checkoutForm">
+
+                <div style="margin-bottom: 32px;">
+                    <h3 style="font-size: 16px; font-weight: 800; text-transform: uppercase; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid #eee;">
+                        Shipping Address
+                    </h3>
+
+                    <div id="saved-addresses"></div>
+
+                    <p style="font-size:13px; color:#888; margin:12px 0;">Or enter a new address below:</p>
+
+                    <div class="form-group">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" id="full_name" name="full_name" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Phone</label>
+                        <input type="text" id="phone" name="phone" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Address</label>
+                        <input type="text" id="address_line" name="address_line" class="form-control" required>
+                    </div>
+
+                    <div class="form-row" style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                        <div class="form-group">
+                            <label class="form-label">City</label>
+                            <input type="text" id="city" name="city" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Province</label>
+                            <input type="text" id="province" name="province" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Postal Code</label>
+                        <input type="text" id="postal_code" name="postal_code" class="form-control">
+                    </div>
+
+                    <div style="display:flex; align-items:center; gap:8px; margin-top:8px;">
+                        <input type="checkbox" id="save_address" name="save_address" value="1">
+                        <label for="save_address" style="margin:0; font-size:13px;">Save this address for next time</label>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 style="font-size: 16px; font-weight: 800; text-transform: uppercase; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid #eee;">
+                        Payment Method
+                    </h3>
+
+                    <div style="display:flex; align-items:center; gap:12px; border:1.5px solid #ccc; padding:14px; margin-bottom:10px;">
+                        <input type="radio" name="payment_method" id="cod" value="cod" checked>
+                        <label for="cod" style="margin:0; font-weight:600;">Cash on Delivery</label>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:12px; border:1.5px solid #ccc; padding:14px; margin-bottom:10px;">
+                        <input type="radio" name="payment_method" id="gcash" value="gcash">
+                        <label for="gcash" style="margin:0; font-weight:600;">GCash</label>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:12px; border:1.5px solid #ccc; padding:14px;">
+                        <input type="radio" name="payment_method" id="card" value="card">
+                        <label for="card" style="margin:0; font-weight:600;">Credit / Debit Card</label>
+                    </div>
+                </div>
+
+            </form>
+
+            <div style="background:#f5f5f5; padding: 28px; align-self: start; position: sticky; top: 20px;">
+                <h3 style="font-size: 18px; font-weight: 800; text-transform: uppercase; margin-bottom: 20px;">Order Summary</h3>
+
+                <div id="checkout-items" style="margin-bottom: 20px;"></div>
+
+                <div style="display:flex; justify-content:space-between; font-size:14px; margin-top:14px; padding-top:14px; border-top:1px solid #ddd;">
+                    <span>Subtotal</span>
+                    <span id="checkout-subtotal">₱0.00</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:14px; margin:8px 0 16px;">
+                    <span>Shipping</span>
+                    <span id="checkout-shipping">₱0.00</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:18px; font-weight:800; margin-bottom:20px;">
+                    <span>Total</span>
+                    <span id="checkout-total">₱0.00</span>
+                </div>
+
+                <button type="submit" form="checkoutForm" id="placeOrderBtn" class="btn btn-primary" style="width:100%; padding:16px;">
+                    Place Order
+                </button>
+
+                <div id="checkout-error" style="display:none; margin-top:12px; font-size:13px; color:#c00;"></div>
+            </div>
+
+        </div>
+
+        <div id="checkout-empty" style="display:none; padding: 80px 0; text-align: center;">
+            <p style="font-size: 20px; font-weight: 800; text-transform: uppercase; margin-bottom: 12px;">Your Cart is Empty</p>
+            <a href="shop.html" class="btn btn-dark" style="padding: 14px 28px;">Start Shopping</a>
+        </div>
+
+    </section>
+
+    <script src="js/checkout.js"></script>
+</body>
+</html>

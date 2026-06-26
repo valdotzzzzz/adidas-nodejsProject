@@ -8,6 +8,10 @@ const productRoutes = require('./routes/productRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const profileRoutes = require('./routes/profileRoutes');
 const addressRoutes = require('./routes/addressRoutes');
+const cartRoutes = require('./routes/cartRoutes');
+const checkoutRoutes = require('./routes/checkoutRoutes');
+const reviewRoutes = require('./routes/reviewRoutes');
+
 
 const app = express();
 app.use(express.json());
@@ -21,7 +25,12 @@ app.use('/api/products', productRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/addresses', addressRoutes);
+app.use('/api/cart', cartRoutes);
+app.use('/api/checkout', checkoutRoutes);
+app.use('/api/reviews', reviewRoutes);
 
+
+// ...
 app.get('/', (req, res) => {
     res.send('<h1>Adidas E-Commerce API Backend is running!</h1>');
 });

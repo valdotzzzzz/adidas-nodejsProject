@@ -19,14 +19,16 @@ function renderHeader() {
                     <a href="shop.html?category=lifestyle" class="nav-link">Lifestyle</a>
                     <a href="shop.html?category=basketball" class="nav-link">Basketball</a>
                 </nav>
-                <div class="user-actions">
+               <div class="user-actions">
                     <div id="guest-menu" class="auth-group">
                         <a href="login.html" class="btn-link">Sign In</a>
                     </div>
                     <div id="user-menu" class="auth-group" style="display: none;">
+                        <a href="cart.html" class="btn-link">Cart<span id="cart-count" style="margin-left:4px;"></span></a>
                         <a href="profile.html" class="btn-link">My Profile</a>
                         <button id="logoutBtn" class="logout-link">Sign Out</button>
                     </div>
+                </div>
                 </div>
             </div>
         </header>
@@ -77,10 +79,28 @@ function setupAuthStates() {
     if (token) {
         $('#guest-menu').hide();
         $('#user-menu').show();
+        loadCartCount(token);
     }
 
     $(document).on('click', '#logoutBtn', function() {
         localStorage.removeItem('token');
         window.location.href = 'index.html';
+    });
+}
+
+function loadCartCount(token) {
+    $.ajax({
+        url: '/api/cart',
+        method: 'GET',
+        headers: { 'Authorization': 'Bearer ' + token },
+        success: function(cartItems) {
+            const totalQty = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+            if (totalQty > 0) {
+                $('#cart-count').text(`(${totalQty})`);
+            }
+        },
+        error: function() {
+            // Silently ignore — don't break the whole page if this fails
+        }
     });
 }

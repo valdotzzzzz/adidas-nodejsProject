@@ -10,6 +10,8 @@ const Variant = require('./Variant');
 const Order = require('./Order');
 const OrderItem = require('./OrderItem');
 const Address = require('./Address');
+const CartItem = require('./CartItem');
+const Review = require('./Review');
 
 const db = {
     User,
@@ -20,6 +22,8 @@ const db = {
     Order,       
     OrderItem,   
     Address,
+    CartItem,
+    Review,
     sequelize,
     Sequelize
 };
@@ -53,5 +57,17 @@ db.Product.belongsTo(db.Category, { foreignKey: 'category_id' });
 // User <-> Address (One-to-Many)
 db.User.hasMany(db.Address, { foreignKey: 'user_id', onDelete: 'CASCADE' });
 db.Address.belongsTo(db.User, { foreignKey: 'user_id' });
+
+// User <-> CartItem (One-to-Many)
+db.User.hasMany(db.CartItem, { foreignKey: 'user_id', onDelete: 'CASCADE' });
+db.CartItem.belongsTo(db.User, { foreignKey: 'user_id' });
+
+// Variant <-> CartItem (One-to-Many)
+db.Variant.hasMany(db.CartItem, { foreignKey: 'variant_id', onDelete: 'CASCADE' });
+db.CartItem.belongsTo(db.Variant, { foreignKey: 'variant_id' });
+
+// Variant <-> OrderItem (One-to-Many) — needed since order items now reference the variant ordered
+db.Variant.hasMany(db.OrderItem, { foreignKey: 'variant_id' });
+db.OrderItem.belongsTo(db.Variant, { foreignKey: 'variant_id' });
 
 module.exports = db;
