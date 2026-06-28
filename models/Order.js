@@ -13,6 +13,10 @@ const Order = sequelize.define('Order', {
     province: { type: DataTypes.STRING, allowNull: true },
     postal_code: { type: DataTypes.STRING, allowNull: true },
     payment_method: { type: DataTypes.STRING, defaultValue: 'cod' }
+}, {
+    paranoid: true
 });
+
+
 
 module.exports = Order;

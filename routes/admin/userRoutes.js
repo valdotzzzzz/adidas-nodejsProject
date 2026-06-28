@@ -6,5 +6,6 @@ const { protect, authorize } = require('../../middlewares/authMiddleware');
 router.get('/', protect, authorize('admin'), userController.getAllUsers);
 router.patch('/:id/role', protect, authorize('admin'), userController.updateUserRole);
 router.patch('/:id/status', protect, authorize('admin'), userController.toggleUserStatus);
+router.delete('/:id', protect, authorize('admin'), userController.deleteUser);
 
 module.exports = router;

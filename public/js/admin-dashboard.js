@@ -143,11 +143,30 @@ $(document).ready(function() {
                             <option value="cancelled" ${data === 'cancelled' ? 'selected' : ''}>Cancelled</option>
                         </select>`
                 },
-                { data: 'createdAt', render: data => new Date(data).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) }
-            ],
-            responsive: true
-        });
+                { data: 'createdAt', render: data => new Date(data).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) },
+                {
+                    data: 'id',
+                    orderable: false,
+                    render: data => `<button class="btn btn-dark delete-order-row" data-id="${data}" style="padding: 6px 12px; font-size: 11px; color: #ff4444;">Delete</button>`
+                }
+                ],
+                responsive: true
+                });
     }
+
+
+
+                $(document).on('click', '.delete-order-row', function() {
+                    const id = $(this).data('id');
+                    if (confirm('Delete this order record? It will be hidden from the ledger.')) {
+                        $.ajax({
+                            url: `/api/admin/orders/${id}`,
+                            method: 'DELETE',
+                            headers: { 'Authorization': `Bearer ${token}` },
+                            success: function() { ordersTable.ajax.reload(null, false); }
+                        });
+                    }
+                });
 
     $(document).on('change', '.order-status-select', function() {
         const id = $(this).data('id');
@@ -197,12 +216,72 @@ $(document).ready(function() {
                     data: 'id',
                     orderable: false,
                     render: (data, type, row) => `
-                        <button class="btn btn-dark toggle-user-status" data-id="${data}" style="padding: 6px 12px; font-size: 11px; ${row.status === 'active' ? 'color:#ff4444;' : 'color:#4caf50;'}">
-                            ${row.status === 'active' ? 'Deactivate' : 'Reactivate'}
-                        </button>`
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn btn-dark toggle-user-status" data-id="${data}" style="padding: 6px 12px; font-size: 11px; ${row.status === 'active' ? 'color:#ff4444;' : 'color:#4caf50;'}">
+                                ${row.status === 'active' ? 'Deactivate' : 'Reactivate'}
+                            </button>
+                            <button class="btn btn-dark delete-user-row" data-id="${data}" style="padding: 6px 12px; font-size: 11px; color: #ff4444;">Delete</button>
+                        </div>`
                 }
             ],
             responsive: true
+        });
+    }
+
+    function preloadCategoryDropdown() {
+        $.ajax({
+            url: '/api/categories',
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${token}` },
+            success: function(categories) {
+                const select = $('#prod_category_id');
+                const currentVal = select.val();
+                select.empty();
+                categories.forEach(c => select.append(`<option value="${c.id}">${c.name}</option>`));
+                select.append(`<option value="__new__">+ Add New Category</option>`);
+                if (currentVal) select.val(currentVal);
+            }
+        });
+    }
+
+    $(document).on('change', '#prod_category_id', function() {
+        if ($(this).val() !== '__new__') return;
+
+        const name = prompt('New category name:');
+        if (!name || !name.trim()) {
+            $(this).val('');
+            return;
+        }
+
+        $.ajax({
+            url: '/api/categories',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ name: name.trim() }),
+            headers: { 'Authorization': `Bearer ${token}` },
+            success: function(response) {
+                categoriesTable.ajax.reload(null, false);
+                preloadCategoryDropdownThenSelect(response.category.id);
+            },
+            error: function(xhr) {
+                alert(`Category creation error: ${xhr.responseJSON?.message || xhr.statusText}`);
+                $('#prod_category_id').val('');
+            }
+        });
+    });
+
+    function preloadCategoryDropdownThenSelect(newCategoryId) {
+        $.ajax({
+            url: '/api/categories',
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${token}` },
+            success: function(categories) {
+                const select = $('#prod_category_id');
+                select.empty();
+                categories.forEach(c => select.append(`<option value="${c.id}">${c.name}</option>`));
+                select.append(`<option value="__new__">+ Add New Category</option>`);
+                select.val(newCategoryId);
+            }
         });
     }
 
@@ -236,6 +315,20 @@ $(document).ready(function() {
             error: function(xhr) { alert(`Status update error: ${xhr.responseJSON?.message || xhr.statusText}`); }
         });
     });
+
+    $(document).on('click', '.delete-user-row', function() {
+        const id = $(this).data('id');
+        if (confirm('Delete this user account? It will be hidden from the roster.')) {
+            $.ajax({
+                url: `/api/admin/users/${id}`,
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` },
+                success: function() { usersTable.ajax.reload(null, false); },
+                error: function(xhr) { alert(`Delete error: ${xhr.responseJSON?.message || xhr.statusText}`); }
+            });
+        }
+    });
+
     // Trigger Clean Product Modal Definition
     $('#openCreateProductBtn').on('click', function() {
         resetFormStates();
@@ -257,20 +350,6 @@ $(document).ready(function() {
         $('#crudModal').hide();
         resetFormStates();
     });
-
-    // Populate drop down arrays asynchronously
-    function preloadCategoryDropdown() {
-        $.ajax({
-            url: '/api/categories',
-            method: 'GET',
-            headers: { 'Authorization': `Bearer ${token}` },
-            success: function(categories) {
-                const select = $('#prod_category_id');
-                select.empty();
-                categories.forEach(c => select.append(`<option value="${c.id}">${c.name}</option>`));
-            }
-        });
-    }
 
     // PRODUCT SAVE ACTION (CREATE / UPDATE EVALUATOR)
     $('#productCrudForm').on('submit', function(e) {
