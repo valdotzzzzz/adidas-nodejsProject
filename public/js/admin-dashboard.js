@@ -6,11 +6,13 @@ $(document).ready(function() {
         return;
     }
 
-    let productsTable, categoriesTable;
+    let productsTable, categoriesTable, ordersTable, usersTable;
 
     // Initialize Active Tables On Boot
     initProductsTable();
     initCategoriesTable();
+    initOrdersTable();
+    initUsersTable();
     preloadCategoryDropdown();
 
     /* ==========================================================================
@@ -32,6 +34,24 @@ $(document).ready(function() {
         $('.admin-view-panel').hide();
         $('#categories-section').show();
         categoriesTable.ajax.reload(null, false);
+    });
+
+    $('#sidebar-orders-btn').on('click', function(e) {
+    e.preventDefault();
+    $('.nav-item').removeClass('active');
+    $(this).addClass('active');
+    $('.admin-view-panel').hide();
+    $('#orders-section').show();
+    ordersTable.ajax.reload(null, false);
+    });
+
+    $('#sidebar-users-btn').on('click', function(e) {
+        e.preventDefault();
+        $('.nav-item').removeClass('active');
+        $(this).addClass('active');
+        $('.admin-view-panel').hide();
+        $('#users-section').show();
+        usersTable.ajax.reload(null, false);
     });
 
     /* ==========================================================================
@@ -100,7 +120,122 @@ $(document).ready(function() {
     /* ==========================================================================
        CRUD OPERATIONAL CONTROLS & AJAX ACTIONS
        ========================================================================== */
-    
+    function initOrdersTable() {
+        ordersTable = $('#ordersSecureTable').DataTable({
+            ajax: {
+                url: '/api/admin/orders',
+                method: 'GET',
+                dataSrc: '',
+                headers: { 'Authorization': `Bearer ${token}` },
+                error: handleAuthFailure
+            },
+            columns: [
+                { data: 'id', render: data => `#${String(data).padStart(6, '0')}` },
+                { data: 'User', render: data => data ? `${data.name}<br><span style="color:#777; font-size:11px;">${data.email}</span>` : 'Guest' },
+                { data: 'OrderItems', render: data => `${data ? data.length : 0} item(s)` },
+                { data: 'total_amount', render: data => `₱${parseFloat(data).toLocaleString('en-US', { minimumFractionDigits: 2 })}` },
+                {
+                    data: 'status',
+                    render: (data, type, row) => `
+                        <select class="form-select-control order-status-select" data-id="${row.id}" style="padding:6px; background-color:#1a1a1a; border:1px solid #333333; color:#ffffff;">
+                            <option value="pending" ${data === 'pending' ? 'selected' : ''}>Pending</option>
+                            <option value="completed" ${data === 'completed' ? 'selected' : ''}>Completed</option>
+                            <option value="cancelled" ${data === 'cancelled' ? 'selected' : ''}>Cancelled</option>
+                        </select>`
+                },
+                { data: 'createdAt', render: data => new Date(data).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) }
+            ],
+            responsive: true
+        });
+    }
+
+    $(document).on('change', '.order-status-select', function() {
+        const id = $(this).data('id');
+        const status = $(this).val();
+
+        $.ajax({
+            url: `/api/admin/orders/${id}`,
+            method: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify({ status }),
+            headers: { 'Authorization': `Bearer ${token}` },
+            success: function() { ordersTable.ajax.reload(null, false); },
+            error: function(xhr) { alert(`Order update error: ${xhr.responseJSON?.message || xhr.statusText}`); }
+        });
+    });
+
+    function initUsersTable() {
+        usersTable = $('#usersSecureTable').DataTable({
+            ajax: {
+                url: '/api/admin/users',
+                method: 'GET',
+                dataSrc: '',
+                headers: { 'Authorization': `Bearer ${token}` },
+                error: handleAuthFailure
+            },
+            columns: [
+                { data: 'id' },
+                { data: 'name' },
+                { data: 'email' },
+                {
+                    data: 'role',
+                    render: (data, type, row) => `
+                        <select class="form-select-control user-role-select" data-id="${row.id}" style="padding:6px; background-color:#1a1a1a; border:1px solid #333333; color:#ffffff;">
+                            <option value="customer" ${data === 'customer' ? 'selected' : ''}>Customer</option>
+                            <option value="staff" ${data === 'staff' ? 'selected' : ''}>Staff</option>
+                            <option value="admin" ${data === 'admin' ? 'selected' : ''}>Admin</option>
+                        </select>`
+                },
+                {
+                    data: 'status',
+                    render: data => data === 'active'
+                        ? `<span style="color:#4caf50; text-transform:uppercase; font-size:11px;">Active</span>`
+                        : `<span style="color:#ff4444; text-transform:uppercase; font-size:11px;">Deactivated</span>`
+                },
+                { data: 'createdAt', render: data => new Date(data).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) },
+                {
+                    data: 'id',
+                    orderable: false,
+                    render: (data, type, row) => `
+                        <button class="btn btn-dark toggle-user-status" data-id="${data}" style="padding: 6px 12px; font-size: 11px; ${row.status === 'active' ? 'color:#ff4444;' : 'color:#4caf50;'}">
+                            ${row.status === 'active' ? 'Deactivate' : 'Reactivate'}
+                        </button>`
+                }
+            ],
+            responsive: true
+        });
+    }
+
+    $(document).on('change', '.user-role-select', function() {
+        const id = $(this).data('id');
+        const role = $(this).val();
+
+        $.ajax({
+            url: `/api/admin/users/${id}/role`,
+            method: 'PATCH',
+            contentType: 'application/json',
+            data: JSON.stringify({ role }),
+            headers: { 'Authorization': `Bearer ${token}` },
+            success: function() { usersTable.ajax.reload(null, false); },
+            error: function(xhr) {
+                alert(`Role update error: ${xhr.responseJSON?.message || xhr.statusText}`);
+                usersTable.ajax.reload(null, false);
+            }
+        });
+    });
+
+    $(document).on('click', '.toggle-user-status', function() {
+        const id = $(this).data('id');
+        if (!confirm('Are you sure you want to change this user\'s account status?')) return;
+
+        $.ajax({
+            url: `/api/admin/users/${id}/status`,
+            method: 'PATCH',
+            headers: { 'Authorization': `Bearer ${token}` },
+            success: function() { usersTable.ajax.reload(null, false); },
+            error: function(xhr) { alert(`Status update error: ${xhr.responseJSON?.message || xhr.statusText}`); }
+        });
+    });
     // Trigger Clean Product Modal Definition
     $('#openCreateProductBtn').on('click', function() {
         resetFormStates();

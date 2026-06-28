@@ -22,6 +22,8 @@
             <div class="nav-section-title">Overview</div>
             <a href="#" class="nav-item active" id="sidebar-products-btn">👟 Products</a>
             <a href="#" class="nav-item" id="sidebar-categories-btn">🏷️ Categories</a>
+            <a href="#" class="nav-item" id="sidebar-orders-btn">🧾 Orders</a>
+            <a href="#" class="nav-item" id="sidebar-users-btn">👤 Users</a>
             
             <div class="nav-section-title">Account</div>
             <a href="../shop.html" class="nav-item">🌐 Storefront</a>
@@ -79,6 +81,54 @@
                 </table>
             </div>
         </div>
+        <div id="orders-section" class="admin-view-panel" style="display: none;">
+        <div class="section-header" style="margin-bottom: 30px;">
+            <div>
+                <div class="section-label">Transaction Ledger</div>
+                <h2 class="section-title">Manage Orders</h2>
+            </div>
+        </div>
+        <div class="table-card" style="background-color: #111111; padding: 24px; border: 1px solid #1a1a1a;">
+            <table id="ordersSecureTable" class="display" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>Order #</th>
+                        <th>Customer</th>
+                        <th>Items</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="users-section" class="admin-view-panel" style="display: none;">
+        <div class="section-header" style="margin-bottom: 30px;">
+            <div>
+                <div class="section-label">Access Control Roster</div>
+                <h2 class="section-title">Manage Users</h2>
+            </div>
+        </div>
+        <div class="table-card" style="background-color: #111111; padding: 24px; border: 1px solid #1a1a1a;">
+            <table id="usersSecureTable" class="display" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Joined</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
     </main>
 
     <div class="admin-modal-overlay" id="crudModal">
