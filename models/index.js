@@ -47,8 +47,8 @@ db.Order.hasMany(db.OrderItem, { foreignKey: 'order_id' });
 db.OrderItem.belongsTo(db.Order, { foreignKey: 'order_id' });
 
 // Product <-> OrderItem (One-to-Many)
-db.Product.hasMany(db.OrderItem, { foreignKey: 'product_id' });
-db.OrderItem.belongsTo(db.Product, { foreignKey: 'product_id' });
+db.Variant.hasMany(db.OrderItem, { foreignKey: 'variant_id' });
+db.OrderItem.belongsTo(db.Variant, { foreignKey: 'variant_id' });
 
 //Product <-> category
 db.Category.hasMany(db.Product, { foreignKey: 'category_id' });

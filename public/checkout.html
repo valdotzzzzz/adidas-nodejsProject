@@ -72,6 +72,32 @@
                     </div>
                 </div>
 
+                <div style="margin-bottom: 32px;">
+                    <h3 style="font-size: 16px; font-weight: 800; text-transform: uppercase; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid #eee;">
+                        Discounts
+                    </h3>
+
+                    <div class="discount-option">
+                        <input type="radio" name="discount_type" id="discount_none" value="none" checked>
+                        <label for="discount_none">No discount</label>
+                    </div>
+                    <div class="discount-option">
+                        <input type="radio" name="discount_type" id="discount_pwd" value="pwd">
+                        <label for="discount_pwd">PWD Discount (20% off)</label>
+                    </div>
+                    <div class="discount-option">
+                        <input type="radio" name="discount_type" id="discount_senior" value="senior">
+                        <label for="discount_senior">Senior Citizen Discount (20% off)</label>
+                    </div>
+
+                    <div id="discount-id-wrapper" class="fade-collapsible">
+                        <div class="form-group">
+                            <label class="form-label">PWD / Senior Citizen ID Number</label>
+                            <input type="text" id="discount_id_number" name="discount_id_number" class="form-control" placeholder="Enter your ID number">
+                        </div>
+                    </div>
+                </div>
+
                 <div>
                     <h3 style="font-size: 16px; font-weight: 800; text-transform: uppercase; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid #eee;">
                         Payment Method
@@ -89,11 +115,51 @@
                         <input type="radio" name="payment_method" id="card" value="card">
                         <label for="card" style="margin:0; font-weight:600;">Credit / Debit Card</label>
                     </div>
+
+                    <div id="card-form-wrapper" class="fade-collapsible">
+                        <div id="saved-cards"></div>
+
+                        <p style="font-size:13px; color:#888; margin:12px 0;" id="card-form-intro">Or enter a new card below:</p>
+
+                        <div class="form-group">
+                            <label class="form-label">Cardholder Name</label>
+                            <input type="text" id="cardholder_name" name="cardholder_name" class="form-control" autocomplete="cc-name">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Card Number</label>
+                            <input type="text" id="card_number" name="card_number" class="form-control" placeholder="1234 5678 9012 3456" maxlength="19" autocomplete="cc-number">
+                        </div>
+
+                        <div class="form-row" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;">
+                            <div class="form-group">
+                                <label class="form-label">Expiry Month</label>
+                                <input type="text" id="expiry_month" name="expiry_month" class="form-control" placeholder="MM" maxlength="2" autocomplete="cc-exp-month">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Expiry Year</label>
+                                <input type="text" id="expiry_year" name="expiry_year" class="form-control" placeholder="YYYY" maxlength="4" autocomplete="cc-exp-year">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">CVV</label>
+                                <input type="text" id="cvv" name="cvv" class="form-control" placeholder="•••" maxlength="4" autocomplete="cc-csc">
+                            </div>
+                        </div>
+
+                        <div style="display:flex; align-items:center; gap:8px; margin-top:8px;">
+                            <input type="checkbox" id="save_card" name="save_card" value="1">
+                            <label for="save_card" style="margin:0; font-size:13px;">Save this card for next time</label>
+                        </div>
+
+                        <p style="font-size:11px; color:#666; margin-top:10px;">
+                            For your security, only the cardholder name, card brand, and last 4 digits are ever saved. Your full card number and CVV are never stored.
+                        </p>
+                    </div>
                 </div>
 
             </form>
 
-            <div style="background:#f5f5f5; padding: 28px; align-self: start; position: sticky; top: 20px;">
+            <div class="light-card" style="padding: 28px; align-self: start; position: sticky; top: 20px;">
                 <h3 style="font-size: 18px; font-weight: 800; text-transform: uppercase; margin-bottom: 20px;">Order Summary</h3>
 
                 <div id="checkout-items" style="margin-bottom: 20px;"></div>
@@ -101,6 +167,10 @@
                 <div style="display:flex; justify-content:space-between; font-size:14px; margin-top:14px; padding-top:14px; border-top:1px solid #ddd;">
                     <span>Subtotal</span>
                     <span id="checkout-subtotal">₱0.00</span>
+                </div>
+                <div id="checkout-discount-row" style="display:none; justify-content:space-between; font-size:14px; margin:8px 0; color:#1a7a3c;">
+                    <span id="checkout-discount-label">Discount</span>
+                    <span id="checkout-discount-amount">−₱0.00</span>
                 </div>
                 <div style="display:flex; justify-content:space-between; font-size:14px; margin:8px 0 16px;">
                     <span>Shipping</span>

@@ -30,6 +30,7 @@ $(document).ready(function() {
                 $('#cart-loading').hide();
                 console.error('Failed to load cart:', xhr.responseText);
                 $('#cart-empty').show();
+                $('#cart-layout').hide();
             }
         });
     }
@@ -53,13 +54,9 @@ $(document).ready(function() {
 
             const lineTotal = (parseFloat(product.price) * item.quantity).toLocaleString('en-US', { minimumFractionDigits: 2 });
             const lowStock = variant.stock_level > 0 && variant.stock_level <= 5;
-
-            // Build quantity dropdown options (1 up to current stock, capped at 10 for sanity)
+            
+            // Track dynamic maximum bounds based on database stock level (capped at 10)
             const maxQty = Math.min(variant.stock_level, 10) || 1;
-            let qtyOptions = '';
-            for (let i = 1; i <= maxQty; i++) {
-                qtyOptions += `<option value="${i}" ${i === item.quantity ? 'selected' : ''}>${i}</option>`;
-            }
 
             const rowHtml = `
                 <div class="cart-row" data-item-id="${item.id}">
@@ -89,9 +86,11 @@ $(document).ready(function() {
                             </div>
 
                             <div class="cart-row__bottom">
-                                <select class="qty-dropdown qty-select">
-                                    ${qtyOptions}
-                                </select>
+                                <div class="quantity-control">
+                                    <button type="button" class="qty-btn qty-minus">−</button>
+                                    <input type="number" class="qty-input" value="${item.quantity}" min="1" max="${maxQty}">
+                                    <button type="button" class="qty-btn qty-plus">+</button>
+                                </div>
                                 <div class="cart-row__price">₱${lineTotal}</div>
                             </div>
                         </div>
@@ -129,13 +128,6 @@ $(document).ready(function() {
         }
     }
 
-    // Quantity dropdown change
-    $(document).on('change', '.qty-select', function() {
-        const $row = $(this).closest('.cart-row');
-        const newQty = parseInt($(this).val());
-        updateQuantity($row.data('item-id'), newQty);
-    });
-
     function updateQuantity(itemId, newQty) {
         $.ajax({
             url: `/api/cart/${itemId}`,
@@ -143,13 +135,62 @@ $(document).ready(function() {
             contentType: 'application/json',
             headers: { 'Authorization': 'Bearer ' + token },
             data: JSON.stringify({ quantity: newQty }),
-            success: function() { loadCart(); },
+            success: function() { 
+                loadCart(); 
+            },
             error: function(xhr) {
                 alert((xhr.responseJSON && xhr.responseJSON.message) || 'Could not update quantity.');
+                loadCart(); // Reload state to reset the input value to its previous valid state
             }
         });
     }
 
+    /* --- New Stepper Element Interactive Handlers --- */
+
+    // 1. Minus Button Handler
+    $(document).on('click', '.qty-minus', function() {
+        const $input = $(this).siblings('.qty-input');
+        let currentVal = parseInt($input.val()) || 1;
+        if (currentVal > 1) {
+            $input.val(currentVal - 1).trigger('change');
+        }
+    });
+
+    // 2. Plus Button Handler
+    $(document).on('click', '.qty-plus', function() {
+        const $input = $(this).siblings('.qty-input');
+        const maxVal = parseInt($input.attr('max')) || 10;
+        let currentVal = parseInt($input.val()) || 1;
+        
+        if (currentVal < maxVal) {
+            $input.val(currentVal + 1).trigger('change');
+        } else {
+            alert(`Cannot exceed available stock limit of ${maxVal}.`);
+        }
+    });
+
+    // 3. Direct Manual Entry Input Validation Change Trigger
+    $(document).on('change', '.qty-input', function() {
+        const $input = $(this);
+        const $row = $input.closest('.cart-row');
+        const itemId = $row.data('item-id');
+        
+        let minVal = parseInt($input.attr('min')) || 1;
+        let maxVal = parseInt($input.attr('max')) || 10;
+        let newVal = parseInt($input.val());
+
+        if (isNaN(newVal) || newVal < minVal) {
+            newVal = minVal;
+        } else if (newVal > maxVal) {
+            alert(`Maximum structural stock boundary limit is ${maxVal}`);
+            newVal = maxVal;
+        }
+
+        $input.val(newVal);
+        updateQuantity(itemId, newVal);
+    });
+
+    // Remove Item Handler
     $(document).on('click', '.remove-item-btn', function() {
         const itemId = $(this).closest('.cart-row').data('item-id');
         if (!confirm('Remove this item from your bag?')) return;

@@ -7,6 +7,8 @@ $(document).ready(function() {
     }
 
     let checkoutData = null;
+    let discountRate = 0.20;
+    let selectedSavedCardId = null;
 
     loadCheckout();
 
@@ -17,11 +19,13 @@ $(document).ready(function() {
             headers: { 'Authorization': 'Bearer ' + token },
             success: function(data) {
                 checkoutData = data;
+                discountRate = parseFloat(data.discount_rate) || 0.20;
                 $('#checkout-loading').hide();
                 $('#checkout-layout').css('display', 'grid');
 
                 renderOrderSummary(data);
                 renderSavedAddresses(data.addresses);
+                renderSavedCards(data.cards);
             },
             error: function(xhr) {
                 $('#checkout-loading').hide();
@@ -53,10 +57,113 @@ $(document).ready(function() {
             `);
         });
 
-        $('#checkout-subtotal').text('₱' + parseFloat(data.subtotal).toLocaleString('en-US', { minimumFractionDigits: 2 }));
-        $('#checkout-shipping').text(parseFloat(data.shipping_fee) === 0 ? 'Free' : '₱' + parseFloat(data.shipping_fee).toLocaleString('en-US', { minimumFractionDigits: 2 }));
-        $('#checkout-total').text('₱' + parseFloat(data.total).toLocaleString('en-US', { minimumFractionDigits: 2 }));
+        updateTotalsDisplay();
     }
+
+    // Recomputes the subtotal/discount/shipping/total block using the currently
+    // selected discount option. Mirrors the server-side calc in checkoutController.
+    function updateTotalsDisplay() {
+        if (!checkoutData) return;
+
+        const subtotal = parseFloat(checkoutData.subtotal);
+        const shipping = parseFloat(checkoutData.shipping_fee);
+        const discountType = $('input[name="discount_type"]:checked').val();
+
+        let discountAmount = 0;
+        if (discountType === 'pwd' || discountType === 'senior') {
+            discountAmount = Math.round(subtotal * discountRate * 100) / 100;
+        }
+
+        const total = Math.max(subtotal - discountAmount, 0) + shipping;
+
+        $('#checkout-subtotal').text('₱' + subtotal.toLocaleString('en-US', { minimumFractionDigits: 2 }));
+        $('#checkout-shipping').text(shipping === 0 ? 'Free' : '₱' + shipping.toLocaleString('en-US', { minimumFractionDigits: 2 }));
+        $('#checkout-total').text('₱' + total.toLocaleString('en-US', { minimumFractionDigits: 2 }));
+
+        if (discountAmount > 0) {
+            const label = discountType === 'pwd' ? 'PWD Discount' : 'Senior Citizen Discount';
+            $('#checkout-discount-label').text(label);
+            $('#checkout-discount-amount').text('−₱' + discountAmount.toLocaleString('en-US', { minimumFractionDigits: 2 }));
+            $('#checkout-discount-row').css('display', 'flex');
+        } else {
+            $('#checkout-discount-row').hide();
+        }
+    }
+
+    // Toggle the ID-number field whenever the discount selection changes
+    $(document).on('change', 'input[name="discount_type"]', function() {
+        const type = $(this).val();
+        $('#discount-id-wrapper').toggleClass('is-visible', type === 'pwd' || type === 'senior');
+        if (type === 'none') $('#discount_id_number').val('');
+        updateTotalsDisplay();
+    });
+
+    // Toggle the card payment form whenever the payment method changes
+    $(document).on('change', 'input[name="payment_method"]', function() {
+        const isCard = $(this).val() === 'card';
+        $('#card-form-wrapper').toggleClass('is-visible', isCard);
+        if (!isCard) clearSavedCardSelection();
+    });
+
+    // Lets the saved-card click handler share/reset its selection state
+    function clearSavedCardSelection() {
+        selectedSavedCardId = null;
+        $('.saved-card-option').removeClass('is-selected');
+        $('#cardholder_name, #card_number, #expiry_month, #expiry_year').val('').prop('disabled', false);
+        $('#save_card').prop('disabled', false);
+        $('#cvv').val('');
+    }
+
+    function renderSavedCards(cards) {
+        const $container = $('#saved-cards');
+        $container.empty();
+
+        if (!cards || cards.length === 0) {
+            $('#card-form-intro').text('Enter your card details below:');
+            return;
+        }
+
+        $('#card-form-intro').text('Or enter a new card below:');
+
+        cards.forEach(card => {
+            $container.append(`
+                <div class="saved-card-option" data-card-id="${card.id}">
+                    <div>
+                        <div class="saved-card-option__brand">${card.card_brand} •••• ${card.card_last4}</div>
+                        <div class="saved-card-option__meta">${card.cardholder_name} — Expires ${card.expiry_month}/${card.expiry_year}</div>
+                    </div>
+                    <span style="font-size:11px; color:#888;">Use this card</span>
+                </div>
+            `);
+        });
+    }
+
+    // Selecting a saved card fills in the cardholder name + expiry for display,
+    // disables manual entry of the masked number, and only asks for the CVV
+    // (the masked number can't be reconstructed — CVV must always be re-entered)
+    $(document).on('click', '.saved-card-option', function() {
+        const cardId = $(this).data('card-id');
+
+        // Clicking the already-selected card deselects it and re-enables manual entry
+        if (selectedSavedCardId === cardId) {
+            clearSavedCardSelection();
+            return;
+        }
+
+        selectedSavedCardId = cardId;
+        $('.saved-card-option').removeClass('is-selected');
+        $(this).addClass('is-selected');
+
+        const card = (checkoutData.cards || []).find(c => c.id === cardId);
+        if (!card) return;
+
+        $('#cardholder_name').val(card.cardholder_name).prop('disabled', true);
+        $('#card_number').val(`${card.card_brand} •••• ${card.card_last4}`).prop('disabled', true);
+        $('#expiry_month').val(card.expiry_month).prop('disabled', true);
+        $('#expiry_year').val(card.expiry_year).prop('disabled', true);
+        $('#save_card').prop('checked', false).prop('disabled', true);
+        $('#cvv').val('').prop('disabled', false).focus();
+    });
 
     function renderSavedAddresses(addresses) {
         const $container = $('#saved-addresses');
@@ -99,6 +206,9 @@ $(document).ready(function() {
         const $error = $('#checkout-error');
         $error.hide();
 
+        const discountType = $('input[name="discount_type"]:checked').val();
+        const paymentMethod = $('input[name="payment_method"]:checked').val();
+
         const payload = {
             full_name: $('#full_name').val().trim(),
             phone: $('#phone').val().trim(),
@@ -106,13 +216,44 @@ $(document).ready(function() {
             city: $('#city').val().trim(),
             province: $('#province').val().trim(),
             postal_code: $('#postal_code').val().trim(),
-            payment_method: $('input[name="payment_method"]:checked').val(),
-            save_address: $('#save_address').is(':checked')
+            payment_method: paymentMethod,
+            save_address: $('#save_address').is(':checked'),
+            discount_type: discountType,
+            discount_id_number: $('#discount_id_number').val().trim()
         };
 
         if (!payload.full_name || !payload.phone || !payload.address_line || !payload.city) {
             $error.text('Please fill in all required shipping fields.').show();
             return;
+        }
+
+        if ((discountType === 'pwd' || discountType === 'senior') && !payload.discount_id_number) {
+            $error.text('Please enter your PWD / Senior Citizen ID number.').show();
+            return;
+        }
+
+        if (paymentMethod === 'card') {
+            payload.cvv = $('#cvv').val().trim();
+
+            if (selectedSavedCardId) {
+                payload.use_saved_card_id = selectedSavedCardId;
+
+                if (!payload.cvv) {
+                    $error.text('Please enter the CVV for your saved card.').show();
+                    return;
+                }
+            } else {
+                payload.cardholder_name = $('#cardholder_name').val().trim();
+                payload.card_number = $('#card_number').val().replace(/\s/g, '');
+                payload.expiry_month = $('#expiry_month').val().trim();
+                payload.expiry_year = $('#expiry_year').val().trim();
+                payload.save_card = $('#save_card').is(':checked');
+
+                if (!payload.cardholder_name || !payload.expiry_month || !payload.expiry_year || !payload.cvv || payload.card_number.replace(/\D/g, '').length < 12) {
+                    $error.text('Please complete all card payment fields.').show();
+                    return;
+                }
+            }
         }
 
         $btn.prop('disabled', true).text('Placing Order...');

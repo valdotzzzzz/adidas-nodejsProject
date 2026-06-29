@@ -1,6 +1,6 @@
 const db = require('../../models');
-const { Order, OrderItem, User, Variant } = db;
-const sendOrderStatusEmail = require('../../utils/sendOrderEmail');
+const { Order, OrderItem, User, Variant, Product } = db;
+const { sendOrderStatusEmail } = require('../../utils/sendOrderEmail');
 
 // GET /api/admin/orders — list all orders (admin/staff only)
 exports.getAllOrders = async (req, res) => {
@@ -48,15 +48,25 @@ exports.updateOrderStatus = async (req, res) => {
             return res.status(422).json({ message: 'Invalid status value.' });
         }
 
+        // ✅ Re-fetch with ALL associations the email needs
         const order = await Order.findByPk(req.params.id, {
-            include: [{ model: OrderItem }, { model: User }]
+            include: [
+                { model: User },
+                {
+                    model: OrderItem,
+                    include: [{
+                        model: Variant,
+                        include: [{ model: db.Product }]
+                    }]
+                }
+            ]
         });
 
         if (!order) {
             return res.status(404).json({ message: 'Order not found.' });
         }
 
-        // If cancelling, restock the variants (same safeguard as the Laravel version)
+        // If cancelling, restock the variants
         if (status === 'cancelled' && order.status !== 'cancelled') {
             for (const item of order.OrderItems) {
                 const variant = await Variant.findByPk(item.variant_id);
@@ -69,12 +79,11 @@ exports.updateOrderStatus = async (req, res) => {
         order.status = status;
         await order.save();
 
-        // Send email notification with PDF receipt attached
+        // ✅ Correct call — one argument, no second user param
         try {
-            await sendOrderStatusEmail(order, order.User);
+            await sendOrderStatusEmail(order);
         } catch (emailError) {
             console.error('Failed to send order status email:', emailError.message);
-            // Don't fail the whole request just because email failed
         }
 
         return res.status(200).json({ message: 'Order status updated successfully.', order });

@@ -41,14 +41,37 @@ function renderHeader() {
                                 <path d="M4 21c0-4 4-7 8-7s8 3 8 7"></path>
                             </svg>
                         </a>
-                        <a href="cart.html" class="icon-link" title="Cart">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                                <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"></path>
-                                <line x1="3" y1="6" x2="21" y2="6"></line>
-                                <path d="M16 10a4 4 0 01-8 0"></path>
-                            </svg>
-                            <span id="cart-count" class="cart-badge" style="display:none;">0</span>
-                        </a>
+                        <div class="mini-cart-wrapper" id="miniCartWrapper">
+                            <a href="cart.html" class="icon-link" title="Cart" id="cartIconLink">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                    <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"></path>
+                                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                                    <path d="M16 10a4 4 0 01-8 0"></path>
+                                </svg>
+                                <span id="cart-count" class="cart-badge" style="display:none;">0</span>
+                            </a>
+                            <div class="mini-cart-dropdown" id="miniCartDropdown">
+                                <div class="mini-cart-header">
+                                    <span class="mini-cart-title">YOUR BAG</span>
+                                    <span class="mini-cart-count" id="miniCartCount">0 items</span>
+                                </div>
+                                <div class="mini-cart-items" id="miniCartItems">
+                                    <div class="mini-cart-loading">Loading...</div>
+                                </div>
+                                <div class="mini-cart-footer" id="miniCartFooter" style="display:none;">
+                                    <div class="mini-cart-total">
+                                        <span>Total</span>
+                                        <span id="miniCartTotal">₱0.00</span>
+                                    </div>
+                                    <a href="cart.html" class="mini-cart-btn">View Bag →</a>
+                                    <a href="checkout.html" class="mini-cart-btn mini-cart-btn--checkout">Checkout →</a>
+                                </div>
+                                <div class="mini-cart-empty" id="miniCartEmpty" style="display:none;">
+                                    <p>Your bag is empty.</p>
+                                    <a href="shop.html">Start Shopping →</a>
+                                </div>
+                            </div>
+                        </div>
                         <button id="logoutBtn" class="logout-link">Sign Out</button>
                     </div>
                 </div>
@@ -129,24 +152,60 @@ function loadCartCount(token) {
             if (totalQty > 0) {
                 $('#cart-count').text(totalQty).show();
             }
+            renderMiniCart(cartItems);
         },
         error: function() {}
     });
 }
 
-function loadCartCount(token) {
-    $.ajax({
-        url: '/api/cart',
-        method: 'GET',
-        headers: { 'Authorization': 'Bearer ' + token },
-        success: function(cartItems) {
-            const totalQty = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-            if (totalQty > 0) {
-                $('#cart-count').text(`(${totalQty})`);
-            }
-        },
-        error: function() {
-            // Silently ignore — don't break the whole page if this fails
-        }
+function renderMiniCart(cartItems) {
+    const $items   = $('#miniCartItems');
+    const $footer  = $('#miniCartFooter');
+    const $empty   = $('#miniCartEmpty');
+    const $count   = $('#miniCartCount');
+
+    $items.empty();
+
+    if (!cartItems || cartItems.length === 0) {
+        $empty.show();
+        $footer.hide();
+        $count.text('0 items');
+        return;
+    }
+
+    const totalQty = cartItems.reduce((sum, i) => sum + i.quantity, 0);
+    $count.text(`${totalQty} ${totalQty === 1 ? 'item' : 'items'}`);
+    $empty.hide();
+
+    let subtotal = 0;
+
+    cartItems.forEach(item => {
+        const variant  = item.Variant || {};
+        const product  = variant.Product || {};
+        const price    = parseFloat(product.price || 0);
+        const lineTotal = price * item.quantity;
+        subtotal += lineTotal;
+
+        const images   = product.ProductImages || product.product_images || [];
+        const imgSrc   = images.length > 0 ? images[0].image_path : 'https://assets.adidas.com/images/h_2000,f_auto,q_auto,fl_lossy,c_fill,g_auto/3b06e3a894364ee89faf7808e7e8b3de_9366/ADIZERO_Dropset_Pro_Training_Shoes_White_KK1551_01_00_standard.jpg';
+
+        $items.append(`
+            <div class="mini-cart-item">
+                <div class="mini-cart-item__img">
+                    <img src="${imgSrc}" alt="${product.name || ''}">
+                </div>
+                <div class="mini-cart-item__info">
+                    <div class="mini-cart-item__name">${product.name || 'Product'}</div>
+                    <div class="mini-cart-item__meta">${variant.colorway || ''} · ${variant.size_type || ''} ${variant.size_value || ''}</div>
+                    <div class="mini-cart-item__price">₱${lineTotal.toLocaleString('en-US', { minimumFractionDigits: 2 })} <span class="mini-cart-item__qty">× ${item.quantity}</span></div>
+                </div>
+            </div>
+        `);
     });
+
+    const shipping = subtotal >= 3000 ? 0 : 150;
+    const total    = subtotal + shipping;
+    $('#miniCartTotal').text('₱' + total.toLocaleString('en-US', { minimumFractionDigits: 2 }));
+    $footer.show();
 }
+

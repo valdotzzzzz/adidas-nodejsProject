@@ -1,41 +1,86 @@
-const transporter = require('../config/mailer');
-const generateReceiptPdf = require('./generateReceiptPdf');
+/**
+ * sendOrderEmail.js
+ * Drop-in replacement for sendOrderStatusEmail.js
+ *
+ * Two exported functions mirror the two Laravel Mailables:
+ *   sendOrderConfirmationEmail(order)  ← called when order is first placed
+ *   sendOrderStatusEmail(order)        ← called when admin updates order status
+ *
+ * Both expect `order` to be a fully-loaded Sequelize instance with:
+ *   order.User
+ *   order.Address
+ *   order.OrderItems[].Variant.Product
+ *
+ * PDF generation uses html-pdf-node (install: npm install html-pdf-node)
+ * You can swap it for puppeteer if you prefer.
+ */
 
-async function sendOrderStatusEmail(order, user) {
-    const pdfBuffer = await generateReceiptPdf(order);
+const transporter               = require('../config/mailer');
+// Change these three lines in sendOrderEmail.js:
+const orderConfirmationTemplate = require('./orderConfirmation');
+const orderStatusTemplate       = require('./orderStatus');
+const receiptTemplate           = require('./reciept');   // matches your filename
 
-    const statusMessages = {
-        pending: 'Your order has been received and is being processed.',
-        completed: 'Great news! Your order has been completed.',
-        cancelled: 'Your order has been cancelled.'
-    };
+/* ── PDF helper ─────────────────────────────────────────── */
+async function generatePdfBuffer(order) {
+    // html-pdf-node is lightweight and works well for server-side PDF generation.
+    // Run: npm install html-pdf-node
+    const htmlPdf = require('html-pdf-node');
+    const html    = receiptTemplate(order);
+
+    const options = { format: 'A4', printBackground: true };
+    const file    = { content: html };
+
+    return htmlPdf.generatePdf(file, options); // returns a Buffer
+}
+
+/* ── Shared mailer ──────────────────────────────────────── */
+async function buildAndSend({ order, subject, htmlBody, attachPdf = false }) {
+    const user     = order.User || {};
+    const orderId  = String(order.id).padStart(6, '0');
+    const filename = `Adidas-AWA-Receipt-${orderId}.pdf`;
 
     const mailOptions = {
-        from: '"Adidas AWA" <no-reply@adidas-awa.com>',
-        to: user.email,
-        subject: `Order #${String(order.id).padStart(6, '0')} Update — ${order.status.toUpperCase()}`,
-        html: `
-            <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto;">
-                <h2 style="margin-bottom: 4px;">ADIDAS</h2>
-                <p style="color: #888; margin-top: 0;">Order Update</p>
-                <p>Hi ${user.name},</p>
-                <p>${statusMessages[order.status] || 'Your order status has been updated.'}</p>
-                <p><strong>Order #${String(order.id).padStart(6, '0')}</strong></p>
-                <p>Status: <strong>${order.status.toUpperCase()}</strong></p>
-                <p>Total: <strong>₱${parseFloat(order.total_amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}</strong></p>
-                <p style="margin-top: 24px; color: #888; font-size: 13px;">Your receipt is attached as a PDF.</p>
-            </div>
-        `,
-        attachments: [
-            {
-                filename: `receipt-order-${order.id}.pdf`,
-                content: pdfBuffer,
-                contentType: 'application/pdf'
-            }
-        ]
+        from   : '"Adidas AWA" <no-reply@adidas-awa.com>',
+        to     : user.email,
+        subject,
+        html   : htmlBody,
+        attachments: [],
     };
+
+    if (attachPdf) {
+        const pdfBuffer = await generatePdfBuffer(order);
+        mailOptions.attachments.push({
+            filename,
+            content    : pdfBuffer,
+            contentType: 'application/pdf',
+        });
+    }
 
     return transporter.sendMail(mailOptions);
 }
 
-module.exports = sendOrderStatusEmail;
+/* ── 1. Order Confirmation (on placement) ───────────────── */
+async function sendOrderConfirmationEmail(order) {
+    const orderId = String(order.id).padStart(6, '0');
+    return buildAndSend({
+        order,
+        subject   : `Order Confirmed — #${orderId} | Adidas AWA`,
+        htmlBody  : orderConfirmationTemplate(order),
+        attachPdf : true,   // attach the PDF receipt on confirmation
+    });
+}
+
+/* ── 2. Order Status Update (on admin change) ───────────── */
+async function sendOrderStatusEmail(order) {
+    const orderId     = String(order.id).padStart(6, '0');
+    const statusLabel = (order.status || 'Updated').charAt(0).toUpperCase() + (order.status || '').slice(1);
+    return buildAndSend({
+        order,
+        subject   : `Your Order #${orderId} has been ${statusLabel} | Adidas AWA`,
+        htmlBody  : orderStatusTemplate(order),
+        attachPdf : false,  // no PDF on status updates, matching IKEA pattern
+    });
+}
+
+module.exports = { sendOrderConfirmationEmail, sendOrderStatusEmail };

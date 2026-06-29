@@ -89,12 +89,20 @@ exports.deleteReview = async (req, res) => {
 
 // Helper — checks Order/OrderItem history for this product, only counting completed orders
 async function hasUserPurchasedProduct(userId, productId) {
-    const count = await OrderItem.count({
+    const variantIds = await db.Variant.findAll({
         where: { product_id: productId },
+        attributes: ['id']
+    }).then(variants => variants.map(v => v.id));
+
+    if (variantIds.length === 0) return false;
+
+    const count = await OrderItem.count({
+        where: { variant_id: variantIds },
         include: [{
             model: Order,
             where: { user_id: userId, status: 'completed' }
         }]
     });
     return count > 0;
+
 }

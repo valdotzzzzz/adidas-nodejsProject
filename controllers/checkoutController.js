@@ -1,5 +1,6 @@
 const db = require('../models');
-const { CartItem, Variant, Product, Order, OrderItem, Address } = db;
+const { CartItem, Variant, Product, Order, OrderItem, Address, User } = db;
+const { sendOrderConfirmationEmail } = require('../utils/sendOrderEmail');
 
 // GET /api/checkout — cart summary + user's saved addresses (for the checkout page to render)
 exports.getCheckoutData = async (req, res) => {
@@ -59,7 +60,7 @@ exports.placeOrder = async (req, res) => {
             return res.status(400).json({ message: 'Your cart is empty.' });
         }
 
-        // Validate stock for every item BEFORE creating anything (same safeguard as Laravel version)
+        // Validate stock for every item BEFORE creating anything
         for (const item of cartItems) {
             if (item.Variant.stock_level < item.quantity) {
                 await t.rollback();
@@ -103,8 +104,7 @@ exports.placeOrder = async (req, res) => {
             await item.Variant.decrement('stock_level', { by: item.quantity, transaction: t });
         }
 
-        // Save shipping address snapshot on the order if you add those columns (see note below)
-        // For now, optionally also save it to the Address book if requested
+        // Save address to address book if requested
         if (req.body.save_address) {
             await Address.create({
                 user_id: req.user.id,
@@ -117,6 +117,28 @@ exports.placeOrder = async (req, res) => {
 
         await t.commit();
 
+        // ── Send confirmation email (after commit so data is fully saved) ──
+        // Re-fetch the order with all nested associations the email templates need
+        try {
+            const fullOrder = await Order.findByPk(order.id, {
+                include: [
+                    { model: User },
+                    {
+                        model: OrderItem,
+                        include: [{
+                            model: Variant,
+                            include: [{ model: Product }]
+                        }]
+                    }
+                ]
+            });
+
+            await sendOrderConfirmationEmail(fullOrder);
+        } catch (emailErr) {
+            // Never block the order response if the email fails
+            console.error('Order confirmation email failed:', emailErr.message);
+        }
+
         return res.status(201).json({ message: 'Order placed successfully!', order });
     } catch (error) {
         await t.rollback();
@@ -124,7 +146,6 @@ exports.placeOrder = async (req, res) => {
     }
 };
 
-// GET /api/checkout/orders/:id — order confirmation / detail
 // GET /api/checkout/orders/:id — order confirmation / detail
 exports.getOrderById = async (req, res) => {
     try {

@@ -22,7 +22,7 @@
 
             <div id="order-loading" style="color:#888;">Loading order details...</div>
 
-            <div id="order-details" style="display:none; background:#f5f5f5; padding:24px; text-align:left; margin-bottom:32px;">
+            <div id="order-details" class="light-card" style="display:none; padding:24px; text-align:left; margin-bottom:32px;">
                 <div style="display:flex; justify-content:space-between; padding:8px 0; font-size:14px;">
                     <span>Order Number</span>
                     <strong id="order-number"></strong>
@@ -30,6 +30,10 @@
                 <div style="display:flex; justify-content:space-between; padding:8px 0; font-size:14px;">
                     <span>Payment Method</span>
                     <strong id="order-payment"></strong>
+                </div>
+                <div id="order-discount-row" style="display:none; justify-content:space-between; padding:8px 0; font-size:14px;">
+                    <span id="order-discount-label">Discount</span>
+                    <strong id="order-discount-amount"></strong>
                 </div>
                 <div style="display:flex; justify-content:space-between; padding:8px 0; font-size:14px;">
                     <span>Total</span>
